@@ -31,4 +31,8 @@ if (require.main === module) {
   });
 }
 
-module.exports = { app: app, http: http, io: io };
+// Vercel necesita que el export sea la app (funcion); las pruebas usan app.http / app.io
+app.app = app;
+app.http = http;
+app.io = io;
+module.exports = app;
