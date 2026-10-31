@@ -1,0 +1,25 @@
+# Prueba de carga local: 5 solicitudes/s durante 60 s = 300 solicitudes contra UNA Chat en Docker.
+# Cada usuario virtual envia UNA sola solicitud (sin bucles ni pausas).
+# Ejecutar:  TEST_ID=artillery-$(date +%Y%m%d-%H%M%S) artillery run artillery/load-test.yml --output artillery/reports/report.json
+config:
+  target: "http://localhost:3000"
+  phases:
+    - name: carga-5rps-60s
+      duration: 60
+      arrivalRate: 5
+  defaults:
+    headers:
+      content-type: application/json
+      # identifica la prueba en logs y trazas (atributo test.id)
+      x-test-id: "{{ $processEnvironment.TEST_ID }}"
+scenarios:
+  - name: enviar-mensaje
+    flow:
+      - post:
+          url: "/api/messages"
+          json:
+            nombre: "artillery"
+            mensaje: "mensaje de prueba de carga"
+            color: "#3366cc"
+          expect:
+            - statusCode: 200

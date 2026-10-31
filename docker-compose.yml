@@ -1,0 +1,22 @@
+# Uso:  docker compose up --build -d      (el chat queda en http://localhost:3000)
+# Las credenciales de Grafana Cloud se leen del archivo .env (ignorado por git), nunca de este archivo.
+services:
+  una-chat:
+    build: .
+    container_name: una-chat
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      PORT: "3000"
+      OTEL_SERVICE_NAME: una-chat
+      # entorno de origen = local; run.mode distingue la ejecucion en Docker de la de la parte 2 (host)
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment=local,run.mode=docker
+      ENABLE_TEST_ERRORS: "true"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped

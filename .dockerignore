@@ -1,0 +1,12 @@
+node_modules
+.git
+.env
+evidencias
+artillery
+scripts
+test
+tests
+playwright.config.js
+playwright-report
+test-results
+*.md
