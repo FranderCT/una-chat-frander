@@ -1,0 +1,11 @@
+== PRUEBA FUNCIONAL (Docker) ==
+INICIO 2026-10-31T00:26:53.096Z test.id=func-20261031002653 url=http://localhost:3000
+  respuesta 1/8: mensaje funcional 1
+  respuesta 2/8: mensaje funcional 2
+  respuesta 3/8: mensaje funcional 3
+  respuesta 4/8: mensaje funcional 4
+  respuesta 5/8: mensaje funcional 5
+  respuesta 6/8: mensaje funcional 6
+  respuesta 7/8: mensaje funcional 7
+  respuesta 8/8: mensaje funcional 8
+FIN 2026-10-31T00:26:53.115Z respuestas=8/8 (OK)

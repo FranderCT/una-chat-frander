@@ -3,5 +3,3 @@ playwright-report/
 test-results/
 .DS_Store
 .env
-artillery/reports/*
-!artillery/reports/.gitkeep
