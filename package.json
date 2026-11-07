@@ -13,6 +13,7 @@
     "dotenv": "^18.0.9",
     "express": "*",
     "mocha": "^10.2.0",
+    "pg": "^8.23.1",
     "socket.io": "*"
   },
   "scripts": {

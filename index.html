@@ -15,9 +15,14 @@
       #nombre, #m { display: inline-block;}
       #m {width: 69%; margin-right: 4px;}
       #nombre {width: 20%}
+      #barra { display: none; background: #222; color: #fff; padding: 8px 10px; }
+      #barra a, #login a { color: rgb(130, 224, 255); margin-left: 10px; }
+      #login { display: none; padding: 40px; text-align: center; font-size: 16px; }
     </style>
   </head>
   <body>
+    <div id="barra"><span id="usuario"></span><a id="salir" href="/auth/logout">Cerrar sesión</a></div>
+    <div id="login">Inicie sesión para entrar a la sala. <a href="/auth/login">Iniciar sesión</a></div>
     <ul id="messages"></ul>
     <form action="">
       <input id="nombre" autocomplete="off" placeholder="Username" aria-label="Username"/>
@@ -40,7 +45,8 @@
         return color;
      }
 
-      $(function () {
+      // con Auth0 activo: /sala responde 401 sin sesion; con sesion muestra el nombre y "Cerrar sesión"
+      function iniciar() {
         var socket = io();
 
         // emite evento al servidor
@@ -71,6 +77,21 @@
             window.scrollTo(0, document.body.scrollHeight);
         });
 
+      }
+
+      $(function () {
+        $.getJSON('/auth/config').done(function (cfg) {
+          if (!cfg.enabled) { return iniciar(); }
+          $.getJSON('/sala').done(function (u) {
+            $('#usuario').text(u.name);
+            $('#nombre').val(u.name);
+            $('#barra').show();
+            iniciar();
+          }).fail(function () {
+            $('form, #messages').hide();
+            $('#login').show();
+          });
+        }).fail(function () { iniciar(); });
       });
     </script>
   </body>

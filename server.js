@@ -7,6 +7,7 @@ var sentry = require('./sentry');
 // libreriuas
 var validation = require('./libs/unalib');
 var obs = require('./observability');
+var auth = require('./server/auth').createAuth();
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -17,6 +18,9 @@ var port = process.env.PORT || 3000;
 var ERRORES_DE_PRUEBA = process.env.ENABLE_TEST_ERRORS === 'true';
 
 app.use(obs.httpMetrics);
+
+// login con Auth0 (el Client Secret se lee de Supabase Vault); desactivado si faltan AUTH0_*
+auth.mount(app);
 
 // root: presentar html
 app.get('/', function(req, res){
@@ -30,7 +34,7 @@ app.get('/health', function(req, res){
 
 // procesa un mensaje por HTTP: mismo flujo que el evento de socket, usado por la prueba de carga
 // POST /api/messages  {"nombre": "...", "mensaje": "...", "color": "#aabbcc"}
-app.post('/api/messages', express.json({ limit: '10kb' }), function(req, res, next){
+app.post('/api/messages', auth.requireSession, express.json({ limit: '10kb' }), function(req, res, next){
   var cuerpo = req.body;
   var testId = req.get('x-test-id') || '';
   try {
@@ -49,6 +53,9 @@ app.post('/api/messages', express.json({ limit: '10kb' }), function(req, res, ne
     next(err);
   }
 });
+
+// con auth activa, los sockets exigen sesion
+if (auth.enabled) io.use(auth.socketGuard);
 
 // escuchar una conexion por socket
 io.on('connection', function(socket){
@@ -87,8 +94,14 @@ app.use(function(err, req, res, next){
 
 // solo escucha si se ejecuta con "npm start"; las pruebas importan el modulo
 if (require.main === module) {
-  http.listen(port, function(){
-    console.log('listening on *:' + port);
+  auth.init().then(function(){
+    http.listen(port, function(){
+      console.log('listening on *:' + port);
+    });
+  }).catch(function(err){
+    // sin secreto no hay login: fallar al arrancar es mejor que servir un chat sin sesion
+    console.error('auth init failed: ' + err.message);
+    process.exit(1);
   });
 }
 

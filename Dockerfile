@@ -10,6 +10,7 @@ RUN npm ci --omit=dev
 
 COPY server.js telemetry.js sentry.js observability.js index.html ./
 COPY libs ./libs
+COPY server ./server
 
 EXPOSE 3000
 
