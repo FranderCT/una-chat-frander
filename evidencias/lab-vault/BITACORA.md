@@ -54,9 +54,10 @@ para el secreto anterior; en este tenant Auth0 responde `401 access_denied` ("Un
 2. **Cuentas.** Supabase y Auth0 se crearon con la cuenta universitaria; el login del chat se hizo con un usuario de prueba de la base de datos de Auth0
    (`Username-Password-Authentication`), no con Google.
 3. **Conexión.** Sin IPv6 en el equipo de prueba se usó el session pooler `aws-1-ca-central-1.pooler.supabase.com` (el host `aws-0-…` no encuentra el tenant).
-4. **Despliegue desde GitHub Actions.** El workflow `CICD pipeline` ejecuta pruebas (job `test`: success) y dispara el deploy de Render con el secreto
-   `RENDER_DEPLOY_HOOK_URL`. Ese secreto está **pendiente de configurar**, por lo que el job `Deploy` falla; los despliegues de esta práctica se hicieron
-   desde Render (First Deploy automático y Manual Deploy tras la rotación).
+4. **Despliegue desde GitHub Actions.** El workflow `CICD pipeline` ejecuta pruebas (job `test`) y dispara el deploy de Render con el secreto
+   `RENDER_DEPLOY_HOOK_URL`. El secreto se configuró a las 18:48; el run del commit `2fe4ec0` falló en `Deploy` (secreto ausente) y al relanzarlo
+   a las 18:50 terminó con `test: success` y `Deploy: success`. Render mostró el deploy del hook y el del push, ambos **Live** (captura 17).
+   Los despliegues anteriores (First Deploy y Manual Deploy tras la rotación) se hicieron desde Render. Con Auto-Deploy "On Commit" activo, cada push genera además un deploy propio.
 5. **Código del servidor.** El repositorio de partida no traía `server/vault.js` ni `server/auth.js`; se implementaron (Authorization Code + PKCE,
    `client_secret_post`, cookie de sesión firmada, lectura del secreto solo en memoria al arrancar).
 
@@ -64,4 +65,4 @@ para el secreto anterior; en este tenant Auth0 responde `401 access_denied` ("Un
 
 01 Vault · 02 script de privilegios · 03 `anon` 42501 · 04 `authenticated` 42501 · 05 `anon` vs `vault` 42501 · 06 `secret_length` ·
 07 `dashboard_is_member` · 10 primer login · 11 login tras rotación · 12 tipo de app · 13 Client Secret (Post) · 14 callbacks ·
-15 variables de Render enmascaradas · 16 despliegues Live con commit.
+15 variables de Render enmascaradas · 16 despliegues Live con commit · 17 deploy por hook de Actions.
